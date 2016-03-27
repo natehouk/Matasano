@@ -8,16 +8,30 @@ def xor(a, b):
         return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b[:len(a)])])
 
 def crack(hex):
-    score=0
-    plaintext=""
+    score = 0
+    plaintext = ""
     for i in range(0, 256):
-        decoded=""
-        char=chr(i)
+        decoded = ""
+        char = chr(i)
         for byte in bytes(hex.decode("hex")):
             decoded=decoded+xor(byte, char)
         if (englishFreqMatchScore(decoded)>score):
             score=englishFreqMatchScore(decoded)
             plaintext = decoded
+    return plaintext
+
+def crackFile(filename):
+    with open(filename) as file:
+        score = 0
+        plaintext = ""
+        for line in file:
+            try:
+                decoded=crack(line[:-1])
+                if (englishFreqMatchScore(decoded) > score):
+                    score = englishFreqMatchScore(decoded)
+                    plaintext = decoded
+            except: 
+                pass
     return plaintext
 
 # Frequency Finder
