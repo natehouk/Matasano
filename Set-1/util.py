@@ -46,6 +46,7 @@ def brute(ciphers):
 
 def score(candidates):
     maxScore = 0
+    key = ""
     plaintext = ""
     for candidate in candidates:
         score = englishFreqMatchScore(candidate[1])
@@ -63,43 +64,39 @@ def load(filename):
     return lines
 
 def guess_keysize(filename):
-    minDistance = float("inf")
-    for keysize in range(1, 40):
-        distance = average_distance(filename, keysize)
-        print keysize, distance
-        if (distance < minDistance):
-            minDistance = distance
-            predicted = keysize
-    return predicted
-
-def average_distance(filename, keysize):
     with open(filename) as file:
-        totalDistance = 0.0
-        chunkCount = 0
         decoded = bytes(file.read().replace("\n", "").decode("base64"))
-        chunk = decoded[:keysize]
-        while chunk != "":
-            prevChunk = chunk
-            chunkCount += 1
-            chunk = decoded[chunkCount*keysize:chunkCount*keysize+keysize]
-            if (len(chunk) == 0):
-                break
-            totalDistance += float(hamming(prevChunk[:len(chunk)], chunk)) / float(min(len(chunk), keysize))
+        minDistance = float("inf")
+        for keysize in range(1, 50):
+            distance = average_distance(decoded, keysize)
+            print keysize, distance
+            if (distance < minDistance):
+                minDistance = distance
+                predicted = keysize
+        return predicted
+
+def average_distance(decoded, keysize):
+    totalDistance = 0.0
+    chunkCount = 0
+    chunk = decoded[:keysize]
+    while chunk != "":
+        prevChunk = chunk
+        chunkCount += 1
+        chunk = decoded[chunkCount*keysize:chunkCount*keysize+keysize]
+        if (len(chunk) == 0):
+            break
+        totalDistance += float(hamming(prevChunk[:len(chunk)], chunk)) / float(min(len(chunk), keysize))
     return totalDistance / chunkCount
 
 def transpose(filename, keysize):
-    print keysize
     with open(filename) as file:
         blocks = [""]*keysize
         chunkCount = 0
         decoded = bytes(file.read().replace("\n", "").decode("base64"))
         chunk = decoded[:keysize]
         while chunk != "":
-            #print chunk.encode("hex")
-            #print len(chunk)
-            #exit()
-            for byte_index in range (0, min(len(chunk), keysize)):
-                blocks[byte_index] = blocks[byte_index] + chunk[byte_index]
+            for byte_index in range (0, keysize):
+                blocks[byte_index] = blocks[byte_index]# + chunk[byte_index]
             chunkCount +=1
             chunk = decoded[chunkCount*keysize:chunkCount*keysize+keysize]
         key = ""
@@ -109,6 +106,5 @@ def transpose(filename, keysize):
             print result
             key = key + result[0]
             plaintext[block_index] = result[1]
-    print decoded
     print key
     return decrypt(decoded, key)
