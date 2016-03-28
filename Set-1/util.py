@@ -17,6 +17,10 @@ def xor(a, b):
 def decrypt(cipher, key):
     plaintext = ""
     count = 0
+    print "$" + cipher
+    print "NA"
+    print bytes(cipher)
+    print len(cipher)
     for cipher_byte in bytes(cipher.decode("hex")):
         index = count % len(key)
         key_byte = bytes(key)[index]
@@ -59,6 +63,51 @@ def crack(filename):
                 plaintext.extend(brute(line[:-1]))
             except: 
                 pass
+    return plaintext
+
+def guessKeysize(filename):
+    minDistance = float("inf")
+    for keysize in range(2, 40):
+        distance = keysizeDistance(filename, keysize)
+        if (distance < minDistance):
+            minDistance = distance
+            predicted = keysize
+    return predicted
+
+def keysizeDistance(filename, keysize):
+    with open(filename) as file:
+        totalDistance = 0.0
+        byteCount = 0;
+        bytes = file.read(keysize)
+        while bytes != "":
+            prevBytes = bytes
+            bytes = file.read(keysize)
+            if (len(bytes) < keysize):
+                break
+            totalDistance += float(hamming(prevBytes, bytes)) / float(keysize)
+            byteCount += 1
+    return totalDistance / byteCount
+
+def transpose(filename, keysize):
+    with open(filename) as file:
+        matrix = [""]*keysize
+        print matrix
+        bytes = file.read(keysize)#.rstrip("\n")
+        while bytes != "":
+            for byte_index in range (0, keysize):
+                matrix[byte_index] = matrix[byte_index] + bytes[byte_index]
+            bytes = file.read(keysize)#.rstrip("\n")
+            if (len(bytes) < keysize):
+                break
+    print matrix
+    plaintext = []
+    for cipher in matrix:
+        #try:
+            #print(cipher)
+            plaintext.extend(brute(cipher))
+        #except:
+          #  pass
+    print plaintext
     return plaintext
 
 # Frequency Finder
