@@ -7,29 +7,38 @@ def xor(a, b):
     else:
         return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b[:len(a)])])
 
-def crack(hex):
-    score = 0
+def decrypt(cipher, key):
     plaintext = ""
-    for i in range(0, 256):
-        decoded = ""
-        char = chr(i)
-        for byte in bytes(hex.decode("hex")):
-            decoded=decoded+xor(byte, char)
-        if (englishFreqMatchScore(decoded)>score):
-            score=englishFreqMatchScore(decoded)
-            plaintext = decoded
+    count = 0
+    for cipher_byte in bytes(cipher.decode("hex")):
+        index = count % len(key)
+        key_byte = bytes(key)[index]
+        plaintext = plaintext + xor(cipher_byte, key_byte)
     return plaintext
 
-def crackFile(filename):
+def brute(cipher):
+    plaintext = []
+    for i in range(0, 256):
+        key = chr(i)
+        plaintext.append(decrypt(cipher, key))
+    return plaintext
+
+def rank(english):
+    maxScore = 0
+    plaintext = ""
+    for candidate in english:
+        score = englishFreqMatchScore(candidate)
+        if (score > maxScore):
+            maxScore = score 
+            plaintext = candidate
+    return plaintext
+
+def crack(filename):
     with open(filename) as file:
-        score = 0
-        plaintext = ""
+        plaintext = []
         for line in file:
             try:
-                decoded=crack(line[:-1])
-                if (englishFreqMatchScore(decoded) > score):
-                    score = englishFreqMatchScore(decoded)
-                    plaintext = decoded
+                plaintext.extend(brute(line[:-1]))
             except: 
                 pass
     return plaintext
@@ -37,14 +46,10 @@ def crackFile(filename):
 # Frequency Finder
 # http://inventwithpython.com/hacking (BSD Licensed)
 
-
-
 # frequency taken from http://en.wikipedia.org/wiki/Letter_frequency
 englishLetterFreq = {'E': 12.70, 'T': 9.06, 'A': 8.17, 'O': 7.51, 'I': 6.97, 'N': 6.75, 'S': 6.33, 'H': 6.09, 'R': 5.99, 'D': 4.25, 'L': 4.03, 'C': 2.78, 'U': 2.76, 'M': 2.41, 'W': 2.36, 'F': 2.23, 'G': 2.02, 'Y': 1.97, 'P': 1.93, 'B': 1.29, 'V': 0.98, 'K': 0.77, 'J': 0.15, 'X': 0.15, 'Q': 0.10, 'Z': 0.07}
 ETAOIN = 'ETAOINSHRDLCUMWFGYPBVKJXQZ'
 LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
-
 
 def getLetterCount(message):
     # Returns a dictionary with keys of single letters and values of the
@@ -57,10 +62,8 @@ def getLetterCount(message):
 
     return letterCount
 
-
 def getItemAtIndexZero(x):
     return x[0]
-
 
 def getFrequencyOrder(message):
     # Returns a string of the alphabet letters arranged in order of most
@@ -96,7 +99,6 @@ def getFrequencyOrder(message):
         freqOrder.append(freqPair[1])
 
     return ''.join(freqOrder)
-
 
 def englishFreqMatchScore(message):
     # Return the number of matches that the string in the message

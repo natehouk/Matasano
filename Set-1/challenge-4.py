@@ -1,3 +1,4 @@
-from util import crackFile
+from util import rank
+from util import crack
 filename = "4.txt"
-print(crackFile(filename))
+print(rank(crack(filename)))
