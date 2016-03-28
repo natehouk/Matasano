@@ -1,4 +1,5 @@
-from util import rank
-from util import crack
+from util import score
+from util import load
+from util import brute
 filename = "4.txt"
-print(rank(crack(filename)))
+print(score(brute(load(filename))))
