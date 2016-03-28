@@ -1,7 +1,14 @@
+def hamming(a, b):
+    assert len(a) == len(b)
+    a = "".join(format(ord(x), '08b') for x in a)
+    b = "".join(format(ord(x), '08b') for x in b)
+    return sum(x != y for x, y in zip(a, b))
+
 def hex2base64(hex):
     return(hex.decode("hex").encode("base64")[:-1])
 
 def xor(a, b):
+    assert len(a) == len(b)
     if len(a) > len(b):
         return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a[:len(b)], b)])
     else:
