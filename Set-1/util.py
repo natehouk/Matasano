@@ -17,10 +17,9 @@ def hamming(a, b):
     return sum(x != y for x, y in zip(a, b))
 
 def decrypt(cipher, key):
-    assert len(cipher) % 2 == 0
     plaintext = ""
     count = 0
-    for cipher_byte in bytes(cipher.decode("hex")):
+    for cipher_byte in bytes(cipher):
         index = count % len(key)
         key_byte = bytes(key)[index]
         plaintext = plaintext + xor(cipher_byte, key_byte)
@@ -42,67 +41,74 @@ def brute(ciphers):
     for cipher in ciphers:
         for i in range(0, 256):
             key = chr(i)
-            candidates.append(decrypt(cipher, key))
+            candidates.append((key, decrypt(cipher, key)))
     return candidates
 
 def score(candidates):
     maxScore = 0
     plaintext = ""
     for candidate in candidates:
-        score = englishFreqMatchScore(candidate)
+        score = englishFreqMatchScore(candidate[1])
         if (score > maxScore):
             maxScore = score
-            plaintext = candidate
-    return plaintext
+            key = candidate[0]
+            plaintext = candidate[1]
+    return (key, plaintext)
 
 def load(filename):
     with open(filename) as file:
         lines = []
         for line in file:
-            lines.append(line.rstrip("\n"))
+            lines.append(line.rstrip("\n").decode("hex"))
     return lines
 
-def guessKeysize(filename):
+def guess_keysize(filename):
     minDistance = float("inf")
-    for keysize in range(2, 40):
-        distance = keysizeDistance(filename, keysize)
+    for keysize in range(1, 40):
+        distance = average_distance(filename, keysize)
+        print keysize, distance
         if (distance < minDistance):
             minDistance = distance
             predicted = keysize
     return predicted
 
-def keysizeDistance(filename, keysize):
+def average_distance(filename, keysize):
     with open(filename) as file:
         totalDistance = 0.0
-        byteCount = 0;
-        bytes = file.read(keysize)
-        while bytes != "":
-            prevBytes = bytes
-            bytes = file.read(keysize)
-            if (len(bytes) < keysize):
+        chunkCount = 0
+        decoded = bytes(file.read().replace("\n", "").decode("base64"))
+        chunk = decoded[:keysize]
+        while chunk != "":
+            prevChunk = chunk
+            chunkCount += 1
+            chunk = decoded[chunkCount*keysize:chunkCount*keysize+keysize]
+            if (len(chunk) == 0):
                 break
-            totalDistance += float(hamming(prevBytes, bytes)) / float(keysize)
-            byteCount += 1
-    return totalDistance / byteCount
+            totalDistance += float(hamming(prevChunk[:len(chunk)], chunk)) / float(min(len(chunk), keysize))
+    return totalDistance / chunkCount
 
 def transpose(filename, keysize):
+    print keysize
     with open(filename) as file:
-        matrix = [""]*keysize
-        print matrix
-        bytes = file.read(keysize)#.rstrip("\n")
-        while bytes != "":
-            for byte_index in range (0, keysize):
-                matrix[byte_index] = matrix[byte_index] + bytes[byte_index]
-            bytes = file.read(keysize)#.rstrip("\n")
-            if (len(bytes) < keysize):
-                break
-    print matrix
-    plaintext = []
-    for cipher in matrix:
-        #try:
-            #print(cipher)
-            plaintext.extend(brute(cipher))
-        #except:
-          #  pass
-    print plaintext
-    return plaintext
+        blocks = [""]*keysize
+        chunkCount = 0
+        decoded = bytes(file.read().replace("\n", "").decode("base64"))
+        chunk = decoded[:keysize]
+        while chunk != "":
+            #print chunk.encode("hex")
+            #print len(chunk)
+            #exit()
+            for byte_index in range (0, min(len(chunk), keysize)):
+                blocks[byte_index] = blocks[byte_index] + chunk[byte_index]
+            chunkCount +=1
+            chunk = decoded[chunkCount*keysize:chunkCount*keysize+keysize]
+        key = ""
+        plaintext = [""]*keysize
+        for block_index, block in enumerate(blocks):
+            result = score(brute(block))
+            print result
+            key = key + result[0]
+            plaintext[block_index] = result[1]
+    print decoded
+    print key
+    return decrypt(decoded, key)
