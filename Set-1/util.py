@@ -14,7 +14,18 @@ def decrypt(cipher, key):
         index = count % len(key)
         key_byte = bytes(key)[index]
         plaintext = plaintext + xor(cipher_byte, key_byte)
+        count += 1
     return plaintext
+
+def encrypt(plaintext, key):
+    cipher = ""
+    count = 0
+    for plaintext_byte in bytes(plaintext):
+        index = count % len(key)
+        key_byte = bytes(key)[index]
+        cipher = cipher + xor(plaintext_byte, key_byte)
+        count += 1
+    return cipher.encode("hex")
 
 def brute(cipher):
     plaintext = []
