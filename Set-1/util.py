@@ -83,6 +83,32 @@ def average_distance(decoded, keysize):
         totalDistance += float(hamming(prevChunk[:len(chunk)], chunk)) / min(len(chunk), float(keysize))
     return totalDistance / chunkCount
 
+def detect_aes_ecb(decoded):
+    keysize = 128
+    totalDistance = 0.0
+    matches = 0
+    chunk_xCount = 0
+    chunk_x = decoded[:keysize]
+    while chunk_x != "":
+        chunk_yCount = 0
+        chunk_y = decoded[:keysize]
+        while chunk_y != "":
+            distance = float(hamming(chunk_x[:min(len(chunk_x), len(chunk_y))], chunk_y[:min(len(chunk_x), len(chunk_y))])) / min(len(chunk_x), len(chunk_y), float(keysize))
+            if (chunk_x == chunk_y or distance == 0):
+                matches += 1
+            totalDistance += distance
+            chunk_yCount += 1
+            chunk_y = decoded[chunk_yCount*keysize:chunk_yCount*keysize+keysize]
+            if (len(chunk_y) == 0):
+                chunk_yCount -= 1
+                break
+        chunk_xCount += 1
+        chunk_x = decoded[chunk_xCount*keysize:chunk_xCount*keysize+keysize]
+        if (len(chunk_x) == 0):
+            chunk_xCount -= 1
+            break
+    return (totalDistance / chunk_xCount, matches)
+
 def transpose(filename, keysize):
     with open(filename) as file:
         blocks = {}
