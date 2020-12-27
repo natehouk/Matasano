@@ -1,0 +1,10 @@
+from util.util import encrypt
+
+# Given encryption key
+key = "ICE"
+
+# Given text to encrypt
+plaintext = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"
+
+# Print encrypted text
+print(str(encrypt(plaintext, key), "latin-1"))
