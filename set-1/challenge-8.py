@@ -1,6 +1,6 @@
 from util.util import load, encode_hex, detect_aes_ecb
 
-# Ginven input file
+# Given input file
 filename = "set-1/files/input-8.txt"
 
 # Enumerate encrypted texts
