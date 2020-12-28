@@ -1,4 +1,4 @@
-from util.util import hamming, guess_keysize, transpose, score
+from util.util import hamming, guess_keysize, transpose
 
 # Given test
 a = "this is a test"
