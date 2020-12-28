@@ -27,6 +27,14 @@ def xor(a, b):
     else:
         return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b[:len(a)])])
 
+# xor two equal length strings together and return a string
+def xor_bytes(a, b):
+    assert len(a) == len(b)
+    if len(a) > len(b):
+        return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a[:len(b)], b)])
+    else:
+        return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b[:len(a)])])
+
 # Brute force ciphers with single byte key and return list of candidate plaintexts
 def brute(ciphers):
     candidates = []
@@ -165,7 +173,7 @@ def detect_aes_ecb(decoded):
 def pad(plaintext, blocksize):
     plaintext_bytes = bytes(plaintext, 'latin-1')
     padding = blocksize - len(plaintext_bytes) % blocksize
-    if(padding == 16):
+    if(padding == blocksize):
         padding = 0
     padded_bytes = plaintext_bytes
     for byte in range(0, padding):
