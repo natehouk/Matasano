@@ -1,7 +1,9 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from util.util import load, encode_hex, detect_aes_ecb
 
 # Given input file
-filename = "set-1/files/input-8.txt"
+filename = "files/input-08.txt"
 
 # Enumerate encrypted texts
 results = []

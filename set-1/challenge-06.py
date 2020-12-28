@@ -1,3 +1,5 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from util.util import hamming, guess_keysize, transpose
 
 # Given test
@@ -6,7 +8,7 @@ b = "wokka wokka!!!"
 assert(hamming(a, b) == 37)
 
 # Given input file
-filename = "set-1/files/input-6.txt"
+filename = "files/input-06.txt"
 
 # Guess keysize
 keysize = guess_keysize(filename)

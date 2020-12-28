@@ -1,7 +1,9 @@
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from util.util import score, load, brute
 
 # Given input file
-filename = "set-1/files/input-4.txt"
+filename = "files/input-04.txt"
 
 # Brute force ciphers and rank by score
 max = 0
