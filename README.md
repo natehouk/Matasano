@@ -3,5 +3,5 @@
 Output the solution by running the respective problem:
 
 ```
-$ python3 set-<x>/challenge-<x>.py
+$ python3 set-<x>/challenge-<xx>.py
 ```
