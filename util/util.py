@@ -51,10 +51,10 @@ def score(candidates):
     return results
 
 # Decrypt cipher with repeating-key xor with given key and return plaintext
-def decrypt_xor(cipher, key):
+def decrypt_xor(ciphertext, key):
     plaintext = ""
     count = 0
-    for cipher_byte in str(cipher):
+    for cipher_byte in str(ciphertext):
         index = count % len(key)
         key_byte = key[index]
         plaintext = plaintext + xor(cipher_byte, key_byte)
@@ -79,6 +79,33 @@ def decrypt_ecb(key, ciphertext):
 # Encrypt ECB ciphertext using given key
 def encrypt_ecb(key, plaintext):
     return AES.new(key, AES.MODE_ECB).encrypt(plaintext)
+
+# Decrypt ciphertext using ECB with CBC mode using given key
+def decrypt_ecb_with_cbc(ciphertext, key, iv):
+    plaintext=b""
+    blocks = int(len(ciphertext) / 16)
+    for i in reversed(range(0, blocks)):
+        if (i == 0):
+            prev_block = str(iv, 'latin-1')
+        else:
+            prev_block = str(ciphertext[(i - 1) * 16:i * 16], 'latin-1')
+        block = str(ciphertext[i * 16:(i + 1) * 16], 'latin-1')
+        decrypted_block = decrypt_ecb(key, pad(block, 16))
+        decrypted_block = xor(str(decrypted_block, 'latin-1'), prev_block)
+        plaintext = bytes(decrypted_block, 'latin-1') + plaintext
+    return str(plaintext, 'latin-1')
+
+# Encrypt plaintext using ECB in CBC mode using given key
+def encrypt_ecb_with_cbc(plaintext, key, iv):
+    ciphertext = b""
+    blocks = int(len(plaintext) / 16)
+    for i in range(0, blocks):
+        block = plaintext[i * 16:(i + 1) * 16]
+        block = xor(block, str(iv, 'latin-1'))
+        encrypted_block = encrypt_ecb(key, pad(block, 16))
+        ciphertext += encrypted_block
+        iv = encrypted_block
+    return ciphertext
 
 # Load hex strings from file
 def load(filename):
