@@ -11,7 +11,7 @@ iv = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 # Given input file
 filename = "files/input-10.txt"
 
-# Open file and read plaintext
+# Open file and read ciphertext
 with open(filename) as file:
     ciphertext = decode_base64(file.read().replace("\n", ""))
 
