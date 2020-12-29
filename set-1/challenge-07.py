@@ -1,4 +1,6 @@
-from Crypto.Cipher import AES
+import sys, os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from util.util import decrypt_ecb
 import base64
 
 # Given constants
@@ -10,8 +12,7 @@ filename = "files/input-07.txt"
 # Decrypt file
 with open(filename) as file:
     ciphertext = base64.b64decode(file.read().replace("\n", ""))
-decobj = AES.new(key, AES.MODE_ECB)
-plaintext = decobj.decrypt(ciphertext)
+plaintext = decrypt_ecb(key, ciphertext)
 
 # Print decrypted cipher
 print(str(plaintext, "latin-1"))

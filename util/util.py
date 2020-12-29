@@ -1,9 +1,10 @@
 import binascii
 import codecs
 import base64
+from Crypto.Cipher import AES
 from util.freq import englishFreqMatchScore
 
-# Takes a hex string return a base64 string
+# Takes a hex string and returns a base64 value
 def hex2base64(hex):
     return codecs.encode(codecs.decode(hex, 'hex'), 'base64').decode()
 
@@ -14,6 +15,10 @@ def decode_hex(hex):
 # Encode to hex
 def encode_hex(value):
     return binascii.hexlify(bytes(value, 'latin-1'))
+
+# Takes a value in bytes and returns a hex value
+def bytes2hex(value):
+    return binascii.hexlify(value)
 
 # Decode base64 value
 def decode_base64(b64):
@@ -29,6 +34,13 @@ def xor(a, b):
 
 # xor two equal length strings together and return a string
 def xor_bytes(a, b):
+    print(a)
+    print(len(a))
+    print(b)
+    print(len(b))
+    b = str(b, 'latin-1')
+    print(len(b))
+    print(b)
     assert len(a) == len(b)
     if len(a) > len(b):
         return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a[:len(b)], b)])
@@ -74,6 +86,14 @@ def encrypt(plaintext, key):
         cipher = cipher + xor(plaintext_byte, key_byte)
         count += 1
     return encode_hex(cipher)
+
+# Decrypt ECB ciphertext using given key
+def decrypt_ecb(key, ciphertext):
+    return AES.new(key, AES.MODE_ECB).decrypt(ciphertext)
+
+# Encrypt ECB ciphertext using given key
+def encrypt_ecb(key, plaintext):
+    return AES.new(key, AES.MODE_ECB).encrypt(plaintext)
 
 # Load hex strings from file
 def load(filename):
