@@ -80,7 +80,7 @@ def decrypt_ecb(key, ciphertext):
 def encrypt_ecb(key, plaintext):
     return AES.new(key, AES.MODE_ECB).encrypt(plaintext)
 
-# Decrypt ciphertext using ECB with CBC mode using given key
+# Decrypt ciphertext using ECB with CBC mode using given key and iv
 def decrypt_ecb_with_cbc(ciphertext, key, iv):
     plaintext=b""
     blocks = int(len(ciphertext) / 16)
@@ -95,7 +95,7 @@ def decrypt_ecb_with_cbc(ciphertext, key, iv):
         plaintext = bytes(decrypted_block, 'latin-1') + plaintext
     return str(plaintext, 'latin-1')
 
-# Encrypt plaintext using ECB in CBC mode using given key
+# Encrypt plaintext using ECB in CBC mode using given key and iv
 def encrypt_ecb_with_cbc(plaintext, key, iv):
     ciphertext = b""
     blocks = int(len(plaintext) / 16)
