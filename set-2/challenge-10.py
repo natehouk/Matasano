@@ -1,8 +1,6 @@
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from Crypto.Cipher import AES
 from util.util import decode_base64, decrypt_ecb_with_cbc
-import base64
 
 # Given constants
 key = b'YELLOW SUBMARINE'
