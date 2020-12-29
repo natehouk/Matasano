@@ -1,6 +1,7 @@
 import binascii
 import codecs
 import base64
+import random
 from Crypto.Cipher import AES
 from util.freq import englishFreqMatchScore
 
@@ -212,3 +213,22 @@ def pad(plaintext, blocksize):
         padded_bytes += b"\x04"
     assert len(padded_bytes) % blocksize == 0
     return padded_bytes
+
+# Generate random key of size 16 bytes
+def generate_key():
+    return random.randbytes(16)
+
+# Ammend the plaintext with between 5 to 10 random bytes before and after
+def ammend_plaintext(plaintext):
+    return str(random.randbytes(random.randrange(5, 10)) + bytes(plaintext, 'latin-1') + random.randbytes(random.randrange(5, 10)), 'latin-1')
+
+# Encrypt a plaintext using given key with EBC randomly enabling CBC mode
+def encrypt_random(key, plaintext):
+    if random.randint(0, 1):
+        print("Encrypted using ECB without CBC mode")
+        ciphertext = encrypt_ecb(key, plaintext)
+    else:
+        print("Encrypted using ECB with CBC mode")
+        iv = generate_key()
+        ciphertext = encrypt_ecb_with_cbc(str(plaintext, 'latin-1'), key, iv)
+    return ciphertext
