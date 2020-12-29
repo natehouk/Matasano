@@ -38,7 +38,7 @@ def brute(ciphers):
     for cipher in ciphers:
         for i in range(0, 256):
             key = chr(i)
-            candidates.append((key, decrypt(cipher, key)))
+            candidates.append((key, decrypt_xor(cipher, key)))
     return candidates
 
 # Score list of candidate texts by English word frequency and return top 5 candidate plaintexts
@@ -51,7 +51,7 @@ def score(candidates):
     return results
 
 # Decrypt cipher with repeating-key xor with given key and return plaintext
-def decrypt(cipher, key):
+def decrypt_xor(cipher, key):
     plaintext = ""
     count = 0
     for cipher_byte in str(cipher):
@@ -62,7 +62,7 @@ def decrypt(cipher, key):
     return plaintext
 
 # Encrypt plaintext with repeating-key xor with given key and return cipher
-def encrypt(plaintext, key):
+def encrypt_xor(plaintext, key):
     cipher = ""
     count = 0
     for plaintext_byte in plaintext:
@@ -145,7 +145,7 @@ def transpose(filename, keysize):
             result = score(brute(ciphers))
             key = key + result[0][1]
     print("Key: " + key)
-    return decrypt(decoded, key)
+    return decrypt_xor(decoded, key)
 
 # Compare chunks by counting repeating blocks as an indicator of ECB encryption
 def detect_aes_ecb(decoded):

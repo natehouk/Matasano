@@ -1,7 +1,7 @@
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from Crypto.Cipher import AES
-from util.util import xor, pad, encode_hex, hex2base64, encrypt_ecb, decrypt_ecb, bytes2hex
+from util.util import xor, pad, encode_hex, encrypt_ecb, decrypt_ecb, bytes2hex
 import base64
 
 # Given constants
