@@ -1,13 +1,14 @@
 import sys, os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from Crypto.Cipher import AES
-from util.util import xor, pad, encode_hex, hex2base64, encrypt_ecb, decrypt_ecb, bytes2hex
+from util.util import decode_hex, xor, pad, xor_bytes, encode_hex, hex2base64, encrypt_ecb, decrypt_ecb, bytes2hex
 import base64
 
 # Given constants
 key = b"YELLOW SUBMARINE"
 # iv = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 iv = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+iv = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 # iv = b'\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41\x41'
 
 # Given input file
@@ -20,62 +21,44 @@ with open(filename) as file:
 
 cipher = encrypt_ecb(key, pad("asdf", 16))
 plain = decrypt_ecb(key, cipher)
-print(cipher)
-print(plain)
+#print(cipher)
+#print(plain)
 
 
 ciphertext = b""
-blocks = int(len(plaintext) / 128)
+blocks = int(len(plaintext) / 16)
 for i in range(0, blocks):
-    block = plaintext[i * 128:(i + 1) * 128]
-    #print(len(block))
-    #block = pad(block, 128)
-    #print(len(block))
-    #print(block + "$")
-    #print(str(iv, 'latin-1') + "IV")
-    print(len(iv))
-    print(len(block))
-    print("FDSF")
-    print(len(str(iv, 'latin-1')))
+    block = plaintext[i * 16:(i + 1) * 16]
     block = xor(block, str(iv, 'latin-1'))
-    print(len(block))
-    #print(str(block) + "#")
-    #print(len(str(block)))
-    #block = pad(block, 128)
-    #encobj = AES.new(key, AES.MODE_ECB)
-    #encrypted_block = str(encobj.encrypt(block), 'latin-1')
-    print(type(pad(block, 128)))
-    encrypted_block = encrypt_ecb(key, pad(block, 128))
+    encrypted_block = encrypt_ecb(key, pad(block, 16))
     ciphertext += encrypted_block
-    #print(encode_hex(encrypted_block))
-    print(type(encrypted_block))
     iv = encrypted_block
+ciphertext = ciphertext
 
-# Print decrypted cipher
-print(len(plaintext))
-print(plaintext)
 print(ciphertext)
-print(bytes2hex(ciphertext))
-print(hex2base64(bytes2hex(ciphertext)))
-print("@@@@@@@@@@@@@")
-print(decrypt_ecb(key, ciphertext))
+iv = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
-ciphertext = hex2base64(bytes2hex(ciphertext))
+plaintext=b""
+blocks = int(len(ciphertext) / 16)
+for i in reversed(range(0, blocks)):
+    if (i == 0):
+        prev_block = str(iv, 'latin-1')
+    else:
+        prev_block = str(ciphertext[(i - 1) * 16:i * 16], 'latin-1')
+    print(prev_block)
 
-plaintext=""
-blocks = int(len(ciphertext) / 128)
-print(ciphertext)
-for i in range(0, blocks):
-    block = ciphertext[i * 128:(i + 1) * 128]
+    block = str(ciphertext[i * 16:(i + 1) * 16], 'latin-1')
+    print(block)
     print(len(block))
-    decobj = AES.new(key, AES.MODE_ECB)
-    plaintext_block = str(decobj.decrypt(block), 'latin-1')
-    plaintext += plaintext_block
-    print("==========")
-    print(plaintext_block)
-    print("---------")
-    #iv = bytes(plaintext_block, 'latin-1')
-print(hex2base64(encode_hex(plaintext)))
+    print(len(prev_block))
+    
+    #print(block)
+    decrypted_block = decrypt_ecb(key, pad(block, 16))
+    decrypted_block = xor(str(decrypted_block, 'latin-1'), prev_block)
+    plaintext += bytes(decrypted_block, 'latin-1')
+    #print("@@@@@@@@")
+    #s = str(decrypted_block, 'latin-1')
+print(str(plaintext, 'latin-1'))
 
 #091230aade3eb330dbaa4358f88d2a6c37b72d0cf4c22c344aec4142d00ce530b181ceb5742ecf49b495dee7c71cc8ed302b23a133b9d861bece9fa3186610a6195dc11d49044951e80f10593d8fa8cb1bf2dca84330fb55c9a042e0f4592c45128864cd1d0e593467dbe6a63e58b2b776f5b4b1f79fd7a8ccbd3259e99154ae
 #091230aade3eb330dbaa4358f88d2a6c091230aade3eb330dbaa4358f88d2a6c091230aade3eb330dbaa4358f88d2a6c091230aade3eb330dbaa4358f88d2a6c091230aade3eb330dbaa4358f88d2a6c091230aade3eb330dbaa4358f88d2a6c091230aade3eb330dbaa4358f88d2a6c

@@ -32,21 +32,6 @@ def xor(a, b):
     else:
         return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b[:len(a)])])
 
-# xor two equal length strings together and return a string
-def xor_bytes(a, b):
-    print(a)
-    print(len(a))
-    print(b)
-    print(len(b))
-    b = str(b, 'latin-1')
-    print(len(b))
-    print(b)
-    assert len(a) == len(b)
-    if len(a) > len(b):
-        return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a[:len(b)], b)])
-    else:
-        return "".join([chr(ord(x) ^ ord(y)) for (x, y) in zip(a, b[:len(a)])])
-
 # Brute force ciphers with single byte key and return list of candidate plaintexts
 def brute(ciphers):
     candidates = []
