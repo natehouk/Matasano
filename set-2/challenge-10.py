@@ -15,7 +15,7 @@ filename = "files/input-10a.txt"
 with open(filename) as file:
     plaintext = file.read().replace("\n", "")
 
-# Encrypt plaintext
+# Encrypt plaintext using ECB in CBC mode
 ciphertext = b""
 blocks = int(len(plaintext) / 16)
 for i in range(0, blocks):
@@ -29,7 +29,7 @@ print(ciphertext)
 # Reset iv
 iv = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
-# Decrypt ciphertext
+# Decrypt ciphertext using ECB in CBC mode
 plaintext=b""
 blocks = int(len(ciphertext) / 16)
 for i in reversed(range(0, blocks)):
