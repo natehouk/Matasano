@@ -88,8 +88,8 @@ def decrypt_ecb_with_cbc(ciphertext, key, iv):
         if (i == 0):
             prev_block = str(iv, 'latin-1')
         else:
-            prev_block = str(ciphertext[(i - 1) * 16:i * 16], 'latin-1')
-        block = str(ciphertext[i * 16:(i + 1) * 16], 'latin-1')
+            prev_block = ciphertext[(i - 1) * 16:i * 16]
+        block = ciphertext[i * 16:(i + 1) * 16]
         decrypted_block = decrypt_ecb(key, pad(block, 16))
         decrypted_block = xor(str(decrypted_block, 'latin-1'), prev_block)
         plaintext = bytes(decrypted_block, 'latin-1') + plaintext
